@@ -3,11 +3,9 @@ import re
 from sqlalchemy import create_engine
 from pandas import ExcelWriter
 
-# read in the data to pandas dataframe
-medianInc = pd.read_excel('MedianIncomeRaw.xls',
-                       ##skiprows=5,                      # skip 1st 5 rows of excel file
+# read data
+medianInc = pd.read_excel('MedianIncome_beforeCleaning.xls',
                        header=[0, 1, 2],                   # header is now in the first and 2nd row
-                       ##skipfooter=13,                   # skip last 13 rows of excel file
                        na_values='(NA)',                # na values are "(NA)" in excel
                        usecols=69,                      # only use first 10 columns
                        index_col=[0])             # index columns are 1st - 3rd in excel file but add total to keep it out of multi-index
@@ -15,22 +13,27 @@ medianInc = pd.read_excel('MedianIncomeRaw.xls',
 
 
 
-# pivot median income, standard error and years of education (1st and 2nd levels of multiindex)
+# pivot median income, standard error and year
 medianInc = medianInc.stack().stack()
 
 
-# reset index (this will set index items to columns and fill down all of the missing values)
+# breaks merged 'State' cells
 medianInc= medianInc.reset_index()
+
+#remove junk rows
 medianInc=medianInc.drop(list(range(3536,3637)))
 
 
 
-### Use dataframe.rename() to rename neccessary columns by their index position
+# rename columns appropriately 
 medianInc.rename(columns={medianInc.columns[0] : 'State',
                        medianInc.columns[1] : 'Measurement',
                        medianInc.columns[2] : 'Year',
                        medianInc.columns[3] : 'Dollar: First pair=Current \n Second pair=2016'}
               , inplace=True)    # true so that we don't have to set school = (copy we are returning)
+
+
+#replace odd year entries with plain to allow for data sorting
 medianInc=medianInc.replace('1984 (19)',1984)
 medianInc=medianInc.replace('1985 (20)',1985)
 medianInc=medianInc.replace('1987 (21)',1987)
@@ -46,8 +49,10 @@ medianInc=medianInc.replace('2010 (37)',2010)
 medianInc=medianInc.replace('2013 (38)',2013)
 medianInc=medianInc.replace('2013 (39)',2013)
 
+#sort by state and year to allow for easier, more intuitive navigation
 medianInc=medianInc.sort_values(by=['State','Year'])
 
+medianInc=medianInc.drop(5714)
 
 #writer = ExcelWriter('medianIncExample2.xlsx')
 #medianInc.to_excel(writer,'CleanData',index=False)
