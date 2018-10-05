@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from pandas import Series,DataFrame
 import sys
-myCSV="US_crime_1960_2005.csv" #### <------ENTER DESIRED FILE HERE 
+myCSV="MedianIncome.csv" #### <------ENTER DESIRED FILE HERE 
 
 if (myCSV=="marriage_divorce.csv"):
 	#read the original data
@@ -187,6 +187,10 @@ if (myCSV=="MedianIncome"):
 	#replace odd year entries with plain to allow for data sorting
 	
 	df_mincome.sort_index(axis=0,level='Rate',ascending=False,inplace=True)	#sorting the index
+	idvars_list=['Rate','Year','Aspect']
+	valvars_list=['United States','Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',"Delaware",'D.C.','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
+	df_mincome=pd.melt(df_mincome, id_vars=idvars_list,value_vars=valvars_list,var_name='State')
+	
 	
 	#final table
 	df_mincome
